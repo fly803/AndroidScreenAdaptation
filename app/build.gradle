@@ -1,15 +1,33 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.screenadaptation.test"
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+//        multiDexEnabled true
     }
+
+    dexOptions {
+        preDexLibraries true
+        javaMaxHeapSize "6g"
+        //Warning:The `android.dexOptions.incremental` property is deprecated and it has no effect on the build process.
+        //incremental true
+        dexInProcess = true
+    }
+    
+    lintOptions {
+        abortOnError false
+        checkReleaseBuilds false
+        // 防止在发布的时候出现因MissingTranslation导致Build Failed!
+        disable 'MissingTranslation'
+    }
+    
     buildTypes {
         release {
             minifyEnabled false
@@ -26,4 +44,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(path: ':screenadaptation')
     implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:cardview-v7:27.1.1'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-vector-drawable:27.1.1'
 }
