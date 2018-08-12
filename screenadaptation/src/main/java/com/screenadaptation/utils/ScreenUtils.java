@@ -229,8 +229,9 @@ public final class ScreenUtils {
     public static Bitmap screenShot(@NonNull final Activity activity, boolean isDeleteStatusBar) {
         View decorView = activity.getWindow().getDecorView();
         decorView.setDrawingCacheEnabled(true);
-        decorView.buildDrawingCache();
+        decorView.setWillNotCacheDrawing(false);
         Bitmap bmp = decorView.getDrawingCache();
+        if (bmp == null) return null;
         DisplayMetrics dm = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
         Bitmap ret;
@@ -309,25 +310,71 @@ public final class ScreenUtils {
     /**
      * Adapt the screen for vertical slide.
      *
-     * @param designWidthInDp The size of design diagram's width, in dp,
-     *                        e.g. the design diagram width is 720px, in XHDPI device,
-     *                        the designWidthInDp = 720 / 2.
+     * @param activity        The activity.
+     * @param designWidthInPx The size of design diagram's width, in pixel.
      */
     public static void adaptScreen4VerticalSlide(final Activity activity,
-                                                 final int designWidthInDp) {
-        adaptScreen(activity, designWidthInDp, true);
+                                                 final int designWidthInPx) {
+        adaptScreen(activity, designWidthInPx, true,false);
     }
 
     /**
      * Adapt the screen for horizontal slide.
      *
-     * @param designHeightInDp The size of design diagram's height, in dp,
-     *                         e.g. the design diagram height is 1080px, in XXHDPI device,
-     *                         the designHeightInDp = 1080 / 3.
+     * @param activity         The activity.
+     * @param designHeightInPx The size of design diagram's height, in pixel.
      */
     public static void adaptScreen4HorizontalSlide(final Activity activity,
-                                                   final int designHeightInDp) {
-        adaptScreen(activity, designHeightInDp, false);
+                                                   final int designHeightInPx) {
+        adaptScreen(activity, designHeightInPx, false,false);
+    }
+
+
+    /**
+     * 得到缩放因子
+     * @param sizeInPx
+     * @return
+     */
+    public static float getScaleDesity(final int sizeInPx) {
+        float scaleDesity = 3.0f;
+        if (720 == sizeInPx) {
+            scaleDesity = 2.0f;
+        } else if (1080 == sizeInPx) {
+            scaleDesity = 3.0f;
+        } else if (1440 == sizeInPx) {
+            scaleDesity = 4.0f;
+        } else if (750 == sizeInPx) {
+            scaleDesity = 4.0f;
+        } else {
+            scaleDesity = 3.0f;
+        }
+        return scaleDesity;
+    }
+    
+    /**
+     * Reference from: https://mp.weixin.qq.com/s/d9QCoBP6kV9VSWvVldVVwA
+     * DisplayMetrics#density 就是上述的density
+       DisplayMetrics#densityDpi 就是上述的dpi
+       DisplayMetrics#scaledDensity 字体的缩放因子，正常情况下和density相等，但是调节系统字体大小后会改变这个值
+     */
+    private static void adaptScreen(final Activity activity,
+                                    final int sizeInPx,
+                                    final boolean isVerticalSlide,
+                                    final boolean isMatchScreen) {
+        final DisplayMetrics systemDm = Resources.getSystem().getDisplayMetrics();
+        final DisplayMetrics appDm = mApplication.getResources().getDisplayMetrics();
+        final DisplayMetrics activityDm = activity.getResources().getDisplayMetrics();
+        if (isVerticalSlide) {
+            activityDm.density = activityDm.widthPixels / (float) sizeInPx;
+        } else {
+            activityDm.density = activityDm.heightPixels / (float) sizeInPx;
+        }
+        activityDm.scaledDensity = activityDm.density * (systemDm.scaledDensity / systemDm.density);
+        activityDm.densityDpi = (int) (160 * activityDm.density);
+
+        appDm.density = activityDm.density;
+        appDm.scaledDensity = activityDm.scaledDensity;
+        appDm.densityDpi = activityDm.densityDpi;
     }
 
     /**
@@ -336,30 +383,26 @@ public final class ScreenUtils {
      * @param activity The activity.
      */
     public static void cancelAdaptScreen(final Activity activity) {
+        final DisplayMetrics systemDm = Resources.getSystem().getDisplayMetrics();
         final DisplayMetrics appDm = mApplication.getResources().getDisplayMetrics();
         final DisplayMetrics activityDm = activity.getResources().getDisplayMetrics();
-        activityDm.density = appDm.density;
-        activityDm.scaledDensity = appDm.scaledDensity;
-        activityDm.densityDpi = appDm.densityDpi;
+        activityDm.density = systemDm.density;
+        activityDm.scaledDensity = systemDm.scaledDensity;
+        activityDm.densityDpi = systemDm.densityDpi;
+
+        appDm.density = systemDm.density;
+        appDm.scaledDensity = systemDm.scaledDensity;
+        appDm.densityDpi = systemDm.densityDpi;
     }
 
     /**
-     * Reference from: https://mp.weixin.qq.com/s/d9QCoBP6kV9VSWvVldVVwA
-     * DisplayMetrics#density 就是上述的density
-       DisplayMetrics#densityDpi 就是上述的dpi
-       DisplayMetrics#scaledDensity 字体的缩放因子，正常情况下和density相等，但是调节系统字体大小后会改变这个值
+     * Return whether adapt screen.
+     *
+     * @return {@code true}: yes<br>{@code false}: no
      */
-    private static void adaptScreen(final Activity activity,
-                                    final float sizeInDp,
-                                    final boolean isVerticalSlide) {
+    public static boolean isAdaptScreen() {
+        final DisplayMetrics systemDm = Resources.getSystem().getDisplayMetrics();
         final DisplayMetrics appDm = mApplication.getResources().getDisplayMetrics();
-        final DisplayMetrics activityDm = activity.getResources().getDisplayMetrics();
-        if (isVerticalSlide) {
-            activityDm.density = activityDm.widthPixels / sizeInDp;
-        } else {
-            activityDm.density = activityDm.heightPixels / sizeInDp;
-        }
-        activityDm.scaledDensity = activityDm.density * (appDm.scaledDensity / appDm.density);
-        activityDm.densityDpi = (int) (160 * activityDm.density);
+        return systemDm.density != appDm.density;
     }
 }
