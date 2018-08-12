@@ -14,12 +14,14 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Surface;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.screenadaptation.base.BaseApplication;
+import com.screenadaptation.configs.BaseProjectConfig;
 
 import static android.Manifest.permission.WRITE_SETTINGS;
 
@@ -364,8 +366,49 @@ public final class ScreenUtils {
         final DisplayMetrics systemDm = Resources.getSystem().getDisplayMetrics();
         final DisplayMetrics appDm = mApplication.getResources().getDisplayMetrics();
         final DisplayMetrics activityDm = activity.getResources().getDisplayMetrics();
-        if (isVerticalSlide) {
-            activityDm.density = activityDm.widthPixels / (float) sizeInPx;
+        int widthPixels = activityDm.widthPixels;
+//        float widthDp = sizeInPx/getScaleDesity(sizeInPx);
+        BaseProjectConfig.widthDp = sizeInPx/(float)getScaleDesity(sizeInPx);
+        if(!isMatchScreen){
+            if (isVerticalSlide) {
+                activityDm.density = widthPixels / (float) sizeInPx;
+//                activityDm.density = scaleRadio * getScaleDesity(sizeInPx);
+                activityDm.scaledDensity = activityDm.density;
+                activityDm.densityDpi = (int) (160 * activityDm.density);
+                
+                appDm.density = activityDm.density;
+                appDm.scaledDensity = activityDm.scaledDensity;
+                appDm.densityDpi = activityDm.densityDpi;
+            } else {
+                activityDm.density = widthPixels / (float) sizeInPx;
+                activityDm.scaledDensity = activityDm.density * (systemDm.scaledDensity / systemDm.density);
+                activityDm.densityDpi = (int) (160 * activityDm.density);
+
+                appDm.density = getScaleDesity(sizeInPx);
+                appDm.scaledDensity = activityDm.density;
+                appDm.densityDpi = (int) (160 * activityDm.density);
+            }
+        }else {
+            if (isVerticalSlide) {
+                activityDm.density = widthPixels / (float) sizeInPx;
+                activityDm.scaledDensity = activityDm.density * (systemDm.scaledDensity / systemDm.density);
+                activityDm.densityDpi = (int) (160 * activityDm.density);
+
+                appDm.density = getScaleDesity(sizeInPx);
+                appDm.scaledDensity = activityDm.density;
+                appDm.densityDpi = (int) (160 * activityDm.density);
+            } else {
+                activityDm.density = widthPixels / (float) sizeInPx;
+                activityDm.scaledDensity = activityDm.density * (systemDm.scaledDensity / systemDm.density);
+                activityDm.densityDpi = (int) (160 * activityDm.density);
+
+                appDm.density = getScaleDesity(sizeInPx);
+                appDm.scaledDensity = activityDm.density;
+                appDm.densityDpi = (int) (160 * activityDm.density);
+            }
+        }
+        /*if (isVerticalSlide) {
+            activityDm.density = widthPixels / (float) sizeInPx;
         } else {
             activityDm.density = activityDm.heightPixels / (float) sizeInPx;
         }
@@ -374,7 +417,7 @@ public final class ScreenUtils {
 
         appDm.density = activityDm.density;
         appDm.scaledDensity = activityDm.scaledDensity;
-        appDm.densityDpi = activityDm.densityDpi;
+        appDm.densityDpi = activityDm.densityDpi;*/
     }
 
     /**
