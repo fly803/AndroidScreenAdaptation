@@ -371,7 +371,7 @@ public final class ScreenUtils {
         BaseProjectConfig.widthDp = sizeInPx/(float)getScaleDesity(sizeInPx);
         if(!isMatchScreen){
             if (isVerticalSlide) {
-                activityDm.density = widthPixels / (float) sizeInPx;
+                activityDm.density = widthPixels / BaseProjectConfig.widthDp;
 //                activityDm.density = scaleRadio * getScaleDesity(sizeInPx);
                 activityDm.scaledDensity = activityDm.density;
                 activityDm.densityDpi = (int) (160 * activityDm.density);
