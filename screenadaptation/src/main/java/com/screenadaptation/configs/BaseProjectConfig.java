@@ -8,5 +8,6 @@ package com.screenadaptation.configs;
  */
 
 public class BaseProjectConfig {
+    public static float baseScale = 3.0f;
     public static float widthDp = 360f;
 }

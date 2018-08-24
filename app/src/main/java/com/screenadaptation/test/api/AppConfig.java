@@ -9,6 +9,6 @@ import com.screenadaptation.configs.BaseProjectConfig;
  */
 
 public class AppConfig extends BaseProjectConfig {
-    public static  int widthInPx = 1440;
-    public static  int heightInPx = 1920;
+    public static  int widthInPx = 750;
+    public static  int heightInPx = 1440;
 }

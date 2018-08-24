@@ -346,7 +346,7 @@ public final class ScreenUtils {
         } else if (1440 == sizeInPx) {
             scaleDesity = 4.0f;
         } else if (750 == sizeInPx) {
-            scaleDesity = 4.0f;
+            scaleDesity = 4.32f;
         } else {
             scaleDesity = 3.0f;
         }
@@ -368,10 +368,11 @@ public final class ScreenUtils {
         final DisplayMetrics activityDm = activity.getResources().getDisplayMetrics();
         int widthPixels = activityDm.widthPixels;
 //        float widthDp = sizeInPx/getScaleDesity(sizeInPx);
-        BaseProjectConfig.widthDp = sizeInPx/(float)getScaleDesity(sizeInPx);
+//        BaseProjectConfig.widthDp = sizeInPx/(float)getScaleDesity(sizeInPx);
         if(!isMatchScreen){
             if (isVerticalSlide) {
-                activityDm.density = widthPixels / BaseProjectConfig.widthDp;
+                activityDm.density = (widthPixels*BaseProjectConfig.baseScale)/ sizeInPx ;
+//                Log.d("cg", "adaptScreen activityDm.density: "+activityDm.density);
 //                activityDm.density = scaleRadio * getScaleDesity(sizeInPx);
                 activityDm.scaledDensity = activityDm.density;
                 activityDm.densityDpi = (int) (160 * activityDm.density);
